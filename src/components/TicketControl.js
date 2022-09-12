@@ -12,6 +12,7 @@ class TicketControl extends React.Component {
     super(props);
     console.log(props);
     this.state = {
+      // Implement Redux for these state slices 
       // formVisibleOnPage: false,
       selectedTicket: null,
       editing: false
