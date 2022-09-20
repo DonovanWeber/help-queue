@@ -5,19 +5,40 @@ import TicketDetail from "./TicketDetail";
 import EditTicketForm from "./EditTicketForm";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import db from './../firebase';
 
-class TicketControl extends React.Component {
+function TicketControl() {
   
-  constructor(props){
-    super(props);
-    console.log(props);
-    this.state = {
-      // Implement Redux for these state slices 
-      // formVisibleOnPage: false,
-      selectedTicket: null,
-      editing: false
-    };
-  }
+    const [formVisibleOnPage, setFormVisibleOnPage] = useState(false);
+    const [mainTicketList, setMainTicketList] = useState([]);
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [editing, setEditing] = useState(false);
+    
+    useEffect(() => { 
+    const unSubscribe = onSnapshot(
+      collection(db, "tickets"), 
+      (collectionSnapshot) => {
+        const tickets = [];
+        collectionSnapshot.forEach((doc) => {
+            tickets.push({
+              names: doc.data().names, 
+              location: doc.data().location, 
+              issue: doc.data().issue, 
+              id: doc.id
+            });
+        });
+        setMainTicketList(tickets);
+      }, 
+      (error) => {
+        // do something with error
+      }
+    );
+
+    return () => unSubscribe();
+  }, []);
+
+
   handleEditClick = () => {
     console.log("handleEditClick reached");
     this.setState({editing: true});
